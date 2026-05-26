@@ -195,9 +195,23 @@ function renderOrders() {
         let footerHtml = ''; 
         
         if (isLevantado) {
-            footerHtml = `<div class="d-flex align-items-center w-100"><span style="color:var(--medium-green); font-size:0.9rem;"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> <span style="color:var(--text-muted); margin-left:5px;">Obrigado pela avaliação!</span></span></div>`; 
+            if (o.rating) {
+                // Se o utilizador JÁ avaliou, mostra as estrelas preenchidas fixas
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<i class="${i <= o.rating ? 'fa-solid' : 'fa-regular'} fa-star" style="color:var(--medium-green);"></i>`;
+                }
+                footerHtml = `<div class="d-flex align-items-center w-100"><span style="font-size:0.9rem;">${starsHtml} <span style="color:var(--text-muted); margin-left:5px;">Obrigado pela tua avaliação!</span></span></div>`; 
+            } else {
+                // Se AINDA NÃO avaliou, gera estrelas interativas (clicáveis)
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<i class="fa-regular fa-star" style="color:var(--medium-green); cursor:pointer; font-size:1.3rem;" onclick="submeterAvaliacao(${o.orderId}, ${i})"></i>`;
+                }
+                footerHtml = `<div class="d-flex flex-column w-100 gap-1"><span style="color:var(--text-dark); font-size:0.85rem; font-weight:600;">Avalia o teu cabaz:</span><div class="d-flex gap-2">${starsHtml}</div></div>`;
+            }
         } else {
-            // Adicionado o botão "Simular levantamento" no final da div para os cabazes não levantados
+            // Estado "Pronto para levantar": mantém o botão de simulação
             footerHtml = `<div class="d-flex flex-column w-100 gap-2"><span style="color:var(--text-muted); font-size:0.85rem;"><i class="fa-regular fa-clock"></i> Dirige-te ao parceiro para levantar o teu cabaz.</span><div class="pin-display mt-3 mb-2"><span class="pin-label">Código de Levantamento</span><span class="pin-code">${safePin}</span></div><button class="btn-primary w-100 mt-2" onclick="simularLevantamento(${o.orderId})">Simular levantamento</button></div>`; 
         }
         
@@ -216,6 +230,18 @@ function simularLevantamento(orderId) {
         isRendering = false; // Força a re-renderização
         renderOrders(); // Atualiza a interface
         showToast("Cabaz levantado com sucesso!");
+    }
+}
+
+// funçao para fazer avaliaçoes
+function submeterAvaliacao(orderId, estrelas) {
+    const orderIndex = orders.findIndex(o => o.orderId === orderId);
+    if (orderIndex !== -1) {
+        orders[orderIndex].rating = estrelas; // Grava a nota escolhida no objeto da encomenda
+        saveData(); // Guarda na localStorage
+        isRendering = false; // Permite re-renderizar
+        renderOrders(); // Atualiza o ecrã
+        showToast("Avaliação enviada com sucesso!");
     }
 }
 
