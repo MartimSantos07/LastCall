@@ -179,7 +179,7 @@ function checkout() { const userCart = cart.filter(c => c.userEmail === currentU
 function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); }
 function processPayment() { const userCart = cart.filter(c => c.userEmail === currentUser.email); const btn = document.getElementById('btn-confirm-payment'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A processar...'; btn.disabled = true; setTimeout(() => { const dataStr = new Date().toLocaleDateString('pt-PT', {day:'2-digit', month:'short', year:'numeric'}).replace(/ de /g, ' '); userCart.forEach((item, idx) => { const pin = Math.floor(1000+Math.random()*9000).toString(); orders.push({ ...item, orderId: Date.now()+idx, status: 'pronto', pin: pin, dataCompra: dataStr }); const bIdx = baskets.findIndex(b=>b.id===item.id); if(bIdx!==-1 && baskets[bIdx].stock>0) baskets[bIdx].stock--; }); cart = cart.filter(c=>c.userEmail!==currentUser.email); saveData(); updateCartBadge(); btn.innerHTML = 'Pagar Agora'; btn.disabled=false; closePaymentModal(); showToast("Pagamento aprovado! Encomendas geradas."); showView('orders-view'); }, 1500); }
 
-// --- Encomendas (PIN visível) ---
+// Encomendas (PIN visível)
 function renderOrders() { 
     if (isRendering) return; 
     isRendering = true; 
