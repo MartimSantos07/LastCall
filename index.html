@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>LastCall | Combate o Desperdício</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="toast-container" aria-live="polite"></div>
+
+    <!-- Modal de pagamento MB WAY -->
+    <div id="payment-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-mobile-screen-button" style="color: #0071CE;"></i> Pagamento MB WAY</h3>
+                <button class="btn-close" onclick="closePaymentModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>Confirma o número para pagar o teu carrinho.</p>
+                <div class="checkout-summary">
+                    <span style="color: var(--text-muted); font-weight: 500;">Total a pagar:</span>
+                    <span class="price-large" id="pay-total-price">0.00€</span>
+                </div>
+                <div class="input-group mt-3">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="pay-phone-input" placeholder="O teu nº MB WAY" maxlength="9">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closePaymentModal()">Cancelar</button>
+                <button class="btn-primary mbway-btn" id="btn-confirm-payment" onclick="processPayment()">Pagar Agora</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cabeçalho principal -->
+    <header id="main-header" class="hidden">
+        <div class="header-container">
+            <div class="logo-area" onclick="resetFilters()">
+                <img src="logo.png" alt="LastCall Logo" class="logo-img" onerror="this.src='https://placehold.co/45x45?text=LC'">
+            </div>
+            <div class="desktop-nav">
+                <button class="nav-item-desktop active" onclick="showView('home-view')" id="desk-nav-home">Início</button>
+                <button class="nav-item-desktop" onclick="showView('cart-view')" id="desk-nav-cart">Carrinho <span class="cart-badge-desk hidden" id="cart-badge-desk">0</span></button>
+                <button class="nav-item-desktop" onclick="showView('orders-view')" id="desk-nav-orders">Encomendas</button>
+                <button class="nav-item-desktop" onclick="showView('profile-view')" id="desk-nav-profile">Perfil</button>
+            </div>
+            <div class="header-actions">
+                <div class="avatar-circle" id="header-avatar" onclick="showView('profile-view')">M</div>
+            </div>
+        </div>
+    </header>
+
+    <main id="app-container">
+        <!-- ECRÃ DE AUTENTICAÇÃO -->
+        <section id="auth-view" class="view auth-wrapper">
+            <div class="auth-card fade-in">
+                <div class="auth-header">
+                    <div class="logo-icon-large">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <h1 class="logo-large">LastCall</h1>
+                    <p class="tagline">Salva comida. Poupa dinheiro. 🌍</p>
+                </div>
+
+                <div class="auth-tabs">
+                    <button id="tab-login" class="tab active" onclick="switchAuthTab('login')">Entrar</button>
+                    <button id="tab-register" class="tab" onclick="switchAuthTab('register')">Registar</button>
+                </div>
+
+                <form id="login-form" class="auth-form">
+                    <div class="input-group">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="login-email" placeholder="Email" required autocomplete="email">
+                        <div class="error-message" id="login-email-error"></div>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="Palavra-passe" required autocomplete="current-password">
+                        <div class="error-message" id="login-password-error"></div>
+                    </div>
+                    <button type="submit" class="btn-primary w-100 mt-2">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar
+                    </button>
+                </form>
+
+                <form id="register-form" class="auth-form hidden">
+                    <div class="input-group">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="reg-name" placeholder="Nome completo" required autocomplete="name">
+                        <div class="error-message" id="reg-name-error"></div>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="reg-email" placeholder="Email" required autocomplete="email">
+                        <div class="error-message" id="reg-email-error"></div>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="tel" id="reg-phone" placeholder="Telemóvel (9 dígitos)" pattern="\d{9}" required autocomplete="tel">
+                        <div class="error-message" id="reg-phone-error"></div>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="reg-password" placeholder="Palavra-passe (mín. 6 caracteres)" minlength="6" required autocomplete="new-password">
+                        <div class="error-message" id="reg-password-error"></div>
+                    </div>
+                    <button type="submit" class="btn-primary w-100 mt-2">
+                        <i class="fa-solid fa-user-plus"></i> Criar Conta
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p class="subtitle">🌱 Juntos contra o desperdício alimentar</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOME -->
+        <section id="home-view" class="view hidden fade-in">
+            <div class="search-box mb-2">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search-bar" placeholder="Pesquisar cabazes ou parceiros..." onkeyup="filterBaskets()">
+            </div>
+            <div class="horizontal-scroll categories-scroll mb-4">
+                <button class="cat-btn active" onclick="setCategory('Todas')"><span>🧺</span> Todos</button>
+                <button class="cat-btn" onclick="setCategory('Feitos')"><span>🍱</span> Cabazes Feitos</button>
+                <button class="cat-btn" onclick="setCategory('Alimentação')"><span>🥦</span> Alimentação</button>
+                <button class="cat-btn" onclick="setCategory('Padaria')"><span>🥐</span> Padaria</button>
+                <button class="cat-btn" onclick="setCategory('Higiene')"><span>🧼</span> Higiene</button>
+            </div>
+            <div class="section-header">
+                <h2>Parceiros Próximos</h2>
+                <button class="text-link" onclick="resetFilters()">Ver todos</button>
+            </div>
+            <div class="horizontal-scroll partners-scroll mb-5" id="partners-container"></div>
+            <div class="section-header">
+                <h2 id="baskets-title">Cabazes Disponíveis</h2>
+                <span class="subtitle" id="results-count">0 resultados</span>
+            </div>
+            <div id="baskets-container" class="grid-container"></div>
+        </section>
+
+        <!-- DETALHE DO CABAZ (com alergénios) -->
+        <section id="basket-detail-view" class="view hidden fade-in">
+            <div class="detail-card">
+                <div class="detail-img-container">
+                    <button class="btn-round-back" onclick="showView('home-view')"><i class="fa-solid fa-arrow-left"></i></button>
+                    <img id="detail-img" src="" alt="Imagem do cabaz">
+                    <div class="detail-discount-tag" id="detail-discount-tag">-0% • Poupa 0€</div>
+                </div>
+                <div class="detail-body">
+                    <p class="detail-category" id="detail-partner-cat">LOJA • CATEGORIA</p>
+                    <h1 class="detail-title" id="detail-name">Nome do Cabaz</h1>
+                    <p class="detail-rating"><i class="fa-solid fa-star"></i> <span id="detail-rating">0.0</span> <span class="text-muted" id="detail-reviews">(0 avaliações)</span></p>
+                    <div class="detail-info-grid mt-3 mb-4">
+                        <div class="info-box"><i class="fa-regular fa-clock"></i><div><span class="info-label">Levantamento</span><span class="info-value" id="detail-time">Hoje, 00h-00h</span></div></div>
+                        <div class="info-box"><i class="fa-regular fa-circle-check"></i><div><span class="info-label">Disponíveis</span><span class="info-value" id="detail-stock">0 cabazes</span></div></div>
+                    </div>
+                    
+                    <!-- SECÇÃO DE ALERGENIOS -->
+                    <div class="allergen-section mb-4" id="allergen-section" style="display: none;">
+                        <h3><i class="fa-solid fa-triangle-exclamation"></i> Alergénios presentes</h3>
+                        <div class="allergen-chips" id="allergen-chips"></div>
+                    </div>
+
+                    <div class="detail-description-box mb-5"><h3>Sobre este cabaz</h3><p id="detail-description">Descrição vai aqui.</p></div>
+                </div>
+                <div class="detail-bottom-bar">
+                    <div class="detail-price-area"><span class="price-old" id="detail-old-price">0.00€</span><span class="price-large" id="detail-price" style="color: var(--dark-green);">0.00€</span></div>
+                    <div class="qty-selector"><button onclick="changeQty(-1)"><i class="fa-solid fa-minus"></i></button><span id="detail-qty">1</span><button onclick="changeQty(1)"><i class="fa-solid fa-plus"></i></button></div>
+                    <button class="btn-add-cart" onclick="addCurrentBasketToCart()"><i class="fa-solid fa-plus"></i> Adicionar</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CARRINHO -->
+        <section id="cart-view" class="view hidden fade-in">
+            <div class="section-header"><h2>O Meu Carrinho</h2><span class="subtitle" id="cart-count">0 itens</span></div>
+            <div id="cart-empty" class="empty-state"><i class="fa-solid fa-basket-shopping text-muted" style="font-size: 4rem;"></i><p style="font-size: 1.1rem; color: var(--dark-green); font-weight: 600;">O teu carrinho está vazio.</p><p class="subtitle">Explora os cabazes e começa a salvar!</p><button class="btn-primary mt-3" onclick="showView('home-view')" style="max-width: 200px;">Explorar Ofertas</button></div>
+            <div id="cart-items-container" class="grid-col-1 hidden"></div>
+            <div id="cart-footer" class="cart-footer hidden"><div class="d-flex justify-content-between mb-3 align-items-center"><span style="font-weight: 600; font-size: 1.1rem;">Total a Pagar</span><span class="price-large" id="cart-total">0.00€</span></div><button class="btn-primary w-100" style="font-size: 1.1rem; padding: 1rem;" onclick="checkout()">Pagar com MB WAY</button></div>
+        </section>
+
+        <!-- ENCOMENDAS -->
+        <section id="orders-view" class="view hidden fade-in">
+            <div class="section-header"><h2>As Minhas Encomendas</h2><span class="subtitle" id="orders-count">0 encomendas</span></div>
+            <div id="orders-container" class="grid-col-1"></div>
+        </section>
+
+        <!-- PERFIL -->
+        <section id="profile-view" class="view hidden fade-in" style="padding: 0;">
+            <div class="profile-top-bg">
+                <div class="d-flex align-items-center gap-3" style="justify-content: flex-start;">
+                    <div class="avatar-large" id="profile-avatar">M</div>
+                    <div><h2 id="profile-name" style="color: white; margin:0; font-size: 1.6rem;">Maria Silva</h2><p id="profile-email" style="color: var(--light-green); margin:0; font-size:0.95rem;"></p><p style="color: rgba(255,255,255,0.7); font-size:0.85rem; margin-top:5px;"><i class="fa-solid fa-leaf"></i> Membro desde <span id="profile-date">Jan 2026</span></p></div>
+                </div>
+            </div>
+            <div class="profile-body-area">
+                <div class="profile-stats-card mb-4"><div class="stat-box"><h3 id="stat-cabazes">0</h3><p>Cabazes</p></div><div class="stat-divider"></div><div class="stat-box"><h3 id="stat-poupado">0€</h3><p>Poupado</p></div><div class="stat-divider"></div><div class="stat-box"><h3 id="stat-co2">0kg</h3><p>CO₂ evitado</p></div></div>
+                <form id="preferences-form">
+                    <div class="pref-card mb-4"><h3><i class="fa-solid fa-id-card"></i> Detalhes Pessoais</h3><div class="input-group"><i class="fa-solid fa-user"></i><input type="text" id="edit-name" placeholder="Nome Completo" required></div><div class="input-group"><i class="fa-solid fa-phone"></i><input type="tel" id="edit-phone" placeholder="Telemóvel" pattern="\d{9}" required></div></div>
+                    <div class="pref-card mb-4"><h3>As Minhas Alergias</h3><div class="chip-group" id="alergias-group"><label class="chip"><input type="checkbox" name="alergia" value="Glúten"><span>Glúten</span></label><label class="chip"><input type="checkbox" name="alergia" value="Lactose"><span>Lactose</span></label><label class="chip"><input type="checkbox" name="alergia" value="Frutos secos"><span>Frutos secos</span></label><label class="chip"><input type="checkbox" name="alergia" value="Amendoim"><span>Amendoim</span></label><label class="chip"><input type="checkbox" name="alergia" value="Soja"><span>Soja</span></label><label class="chip"><input type="checkbox" name="alergia" value="Ovos"><span>Ovos</span></label><label class="chip"><input type="checkbox" name="alergia" value="Peixe"><span>Peixe</span></label><label class="chip"><input type="checkbox" name="alergia" value="Marisco"><span>Marisco</span></label></div></div>
+                    <div class="pref-card mb-4"><h3>Preferências Alimentares</h3><div class="chip-group" id="dietas-group"><label class="chip"><input type="checkbox" name="dieta" value="Vegetariano"><span>Vegetariano</span></label><label class="chip"><input type="checkbox" name="dieta" value="Vegan"><span>Vegan</span></label><label class="chip"><input type="checkbox" name="dieta" value="Sem Glúten"><span>Sem Glúten</span></label><label class="chip"><input type="checkbox" name="dieta" value="Sem Lactose"><span>Sem Lactose</span></label><label class="chip"><input type="checkbox" name="dieta" value="Halal"><span>Halal</span></label><label class="chip"><input type="checkbox" name="dieta" value="Kosher"><span>Kosher</span></label></div></div>
+                    <div class="profile-actions"><button type="submit" class="btn-save-profile w-100 mb-4"><i class="fa-solid fa-floppy-disk"></i> Guardar Alterações</button><button type="button" class="btn-logout w-100" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Terminar Sessão</button></div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation (apenas para telemóvel) -->
+    <nav id="bottom-nav" class="hidden">
+        <button class="nav-item active" onclick="showView('home-view')" id="nav-home"><i class="fa-solid fa-house"></i><span>Início</span></button>
+        <button class="nav-item" onclick="showView('cart-view')" id="nav-cart"><i class="fa-solid fa-bag-shopping"></i><span>Carrinho</span><span class="cart-badge hidden" id="cart-badge">0</span></button>
+        <button class="nav-item" onclick="showView('orders-view')" id="nav-orders"><i class="fa-solid fa-clipboard-list"></i><span>Encomendas</span></button>
+        <button class="nav-item" onclick="showView('profile-view')" id="nav-profile"><i class="fa-regular fa-user"></i><span>Perfil</span></button>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+</html>
