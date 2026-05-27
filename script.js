@@ -188,7 +188,7 @@ function openBasketDetail(id) {
     
     updateDetailPrice();
     showView('basket-detail-view');
-}
+
 function changeQty(amount) { const basket = baskets.find(b => b.id === viewBasketId); if(viewBasketQty + amount > 0 && viewBasketQty + amount <= basket.stock) { viewBasketQty += amount; updateDetailPrice(); } }
 function updateDetailPrice() { const basket = baskets.find(b => b.id === viewBasketId); document.getElementById('detail-qty').innerText = viewBasketQty; document.getElementById('detail-price').innerText = `${(basket.preco * viewBasketQty).toFixed(2)}€`; }
 function addCurrentBasketToCart() { const basket = baskets.find(b => b.id === viewBasketId); if (!basket) return; for(let i = 0; i < viewBasketQty; i++) cart.push({ ...basket, cartId: Date.now() + i, userEmail: currentUser.email }); saveData(); updateCartBadge(); showToast(`Adicionado(s) ${viewBasketQty} cabaz(es) ao carrinho!`); showView('home-view'); }
