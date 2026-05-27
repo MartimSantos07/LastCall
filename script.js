@@ -30,11 +30,9 @@ window.onload = () => {
         orders = JSON.parse(localStorage.getItem('lastcall_orders')) || [];
         cart = JSON.parse(localStorage.getItem('lastcall_cart')) || [];
         
-        // FORÇAR usar os novos cabazes com alergénios, sobrescrevendo qualquer versão antiga
         baskets = [...defaultBaskets];
         localStorage.setItem('lastcall_baskets', JSON.stringify(baskets));
         
-        // Corrigir PINs antigos
         let changed = false;
         orders.forEach(o => { if (!o.pin || o.pin === "****") { o.pin = Math.floor(1000 + Math.random() * 9000).toString(); changed = true; } });
         if (changed) localStorage.setItem('lastcall_orders', JSON.stringify(orders));
@@ -87,6 +85,7 @@ function switchAuthTab(tab) {
     document.getElementById(`tab-${tab}`).classList.add('active');
     document.getElementById(`${tab}-form`).classList.remove('hidden');
 }
+
 document.getElementById('register-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('reg-name').value.trim();
@@ -98,6 +97,7 @@ document.getElementById('register-form').addEventListener('submit', (e) => {
     currentUser = { name, email, phone, password, memberSince, preferences: { alergias: [], dietas: [] } };
     users.push(currentUser); saveData(); showApp();
 });
+
 document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value.trim();
@@ -112,7 +112,9 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
         saveData(); showApp();
     } else showToast("Email ou palavra-passe incorretos.", "error");
 });
+
 function logout() { currentUser = null; localStorage.removeItem('lastcall_currentUser'); document.getElementById('main-header').classList.add('hidden'); document.getElementById('bottom-nav').classList.add('hidden'); showView('auth-view'); }
+
 function showApp() { document.getElementById('main-header').classList.remove('hidden'); document.getElementById('bottom-nav').classList.remove('hidden'); document.getElementById('header-avatar').innerText = currentUser.name.charAt(0).toUpperCase(); updateCartBadge(); showView('home-view'); }
 
 // --- Navegação ---
@@ -136,10 +138,25 @@ function renderPartners() { const c = document.getElementById('partners-containe
 function filterByPartner(nome) { currentPartnerFilter = nome; document.getElementById('baskets-title').innerText = `Ofertas de ${nome}`; renderBaskets(); }
 function resetFilters() { currentPartnerFilter = null; currentCategory = 'Todas'; document.getElementById('search-bar').value = ''; document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active')); document.querySelector('.cat-btn').classList.add('active'); document.getElementById('baskets-title').innerText = `Cabazes Disponíveis`; renderBaskets(); }
 function setCategory(cat) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active')); event.currentTarget.classList.add('active'); renderBaskets(); }
-function renderBaskets() { if (isRendering) return; isRendering = true; const term = document.getElementById('search-bar')?.value.toLowerCase() || ''; let filtered = baskets.filter(b => b.stock > 0); if (term) filtered = filtered.filter(b => b.nome.toLowerCase().includes(term) || b.parceiro.toLowerCase().includes(term)); if (currentPartnerFilter) filtered = filtered.filter(b => b.parceiro === currentPartnerFilter); if (currentCategory !== 'Todas') filtered = filtered.filter(b => b.categoria === currentCategory); const container = document.getElementById('baskets-container'); if (container) { document.getElementById('results-count').innerText = `${filtered.length} resultados`; container.innerHTML = filtered.map(b => `<div class="card fade-in" onclick="openBasketDetail(${b.id})"><div class="card-img-wrapper"><span class="tag-discount">${b.desconto}</span><span class="tag-qty">${b.stock} disponíveis</span><img src="${b.imagem}" class="card-img"></div><div class="card-content"><span class="card-cat">${b.parceiro} • ${b.categoria}</span><h3>${b.nome}</h3><span class="card-rating"><i class="fa-solid fa-star"></i> ${b.avaliacao} <span style="color:var(--text-muted); font-weight:normal;">(${b.numAvaliacoes})</span></span><div class="price-row"><span class="price">${b.preco.toFixed(2)}€</span><span class="price-old">${b.precoOriginal.toFixed(2)}€</span></div></div></div>`).join(''); } isRendering = false; }
+
+function renderBaskets() { 
+    if (isRendering) return; 
+    isRendering = true; 
+    const term = document.getElementById('search-bar')?.value.toLowerCase() || ''; 
+    let filtered = baskets.filter(b => b.stock > 0); 
+    if (term) filtered = filtered.filter(b => b.nome.toLowerCase().includes(term) || b.parceiro.toLowerCase().includes(term)); 
+    if (currentPartnerFilter) filtered = filtered.filter(b => b.parceiro === currentPartnerFilter); 
+    if (currentCategory !== 'Todas') filtered = filtered.filter(b => b.categoria === currentCategory); 
+    const container = document.getElementById('baskets-container'); 
+    if (container) { 
+        document.getElementById('results-count').innerText = `${filtered.length} resultados`; 
+        container.innerHTML = filtered.map(b => `<div class="card fade-in" onclick="openBasketDetail(${b.id})"><div class="card-img-wrapper"><span class="tag-discount">${b.desconto}</span><span class="tag-qty">${b.stock} disponíveis</span><img src="${b.imagem}" class="card-img"></div><div class="card-content"><span class="card-cat">${b.parceiro} • ${b.categoria}</span><h3>${b.nome}</h3><span class="card-rating"><i class="fa-solid fa-star"></i> ${b.avaliacao} <span style="color:var(--text-muted); font-weight:normal;">(${b.numAvaliacoes})</span></span><div class="price-row"><span class="price">${b.preco.toFixed(2)}€</span><span class="price-old">${b.precoOriginal.toFixed(2)}€</span></div></div></div>`).join(''); 
+    } 
+    isRendering = false; 
+}
 function filterBaskets() { renderBaskets(); }
 
-// --- Detalhe do Cabaz (com alergénios) ---
+// --- Detalhe do Cabaz (com alergénios e destaques a vermelho) ---
 function openBasketDetail(id) {
     const basket = baskets.find(b => b.id === id);
     if(!basket) return;
@@ -163,7 +180,7 @@ function openBasketDetail(id) {
         const userAlergias = (currentUser && currentUser.preferences && currentUser.preferences.alergias) ? currentUser.preferences.alergias : [];
         
         allergenChips.innerHTML = basket.alergenos.map(a => {
-            const isAllergic = userAlergias.includes(a); // Verifica se há match
+            const isAllergic = userAlergias.includes(a);
             const chipClass = isAllergic ? 'allergen-chip danger-chip' : 'allergen-chip';
             const icon = isAllergic ? 'fa-triangle-exclamation' : 'fa-circle-exclamation';
             return `<span class="${chipClass}"><i class="fa-solid ${icon}"></i> ${a}</span>`;
@@ -176,18 +193,6 @@ function openBasketDetail(id) {
     updateDetailPrice();
     showView('basket-detail-view');
 }
-    // Mostrar alergénios
-    const allergenSection = document.getElementById('allergen-section');
-    const allergenChips = document.getElementById('allergen-chips');
-    if (basket.alergenos && basket.alergenos.length > 0) {
-        allergenChips.innerHTML = basket.alergenos.map(a => `<span class="allergen-chip"><i class="fa-solid fa-circle-exclamation"></i> ${a}</span>`).join('');
-        allergenSection.style.display = 'block';
-    } else {
-        allergenSection.style.display = 'none';
-    }
-    
-    updateDetailPrice();
-    showView('basket-detail-view');
 
 function changeQty(amount) { const basket = baskets.find(b => b.id === viewBasketId); if(viewBasketQty + amount > 0 && viewBasketQty + amount <= basket.stock) { viewBasketQty += amount; updateDetailPrice(); } }
 function updateDetailPrice() { const basket = baskets.find(b => b.id === viewBasketId); document.getElementById('detail-qty').innerText = viewBasketQty; document.getElementById('detail-price').innerText = `${(basket.preco * viewBasketQty).toFixed(2)}€`; }
@@ -195,10 +200,40 @@ function addCurrentBasketToCart() { const basket = baskets.find(b => b.id === vi
 
 // --- Carrinho ---
 function updateCartBadge() { if(!currentUser) return; const len = cart.filter(c => c.userEmail === currentUser.email).length; document.getElementById('cart-badge').innerText = len; document.getElementById('cart-badge-desk').innerText = len; if(len>0) { document.getElementById('cart-badge').classList.remove('hidden'); document.getElementById('cart-badge-desk').classList.remove('hidden'); } else { document.getElementById('cart-badge').classList.add('hidden'); document.getElementById('cart-badge-desk').classList.add('hidden'); } }
-function renderCart() { if (isRendering) return; isRendering = true; const userCart = cart.filter(c => c.userEmail === currentUser.email); const container = document.getElementById('cart-items-container'); const empty = document.getElementById('cart-empty'); const footer = document.getElementById('cart-footer'); document.getElementById('cart-count').innerText = `${userCart.length} itens`; if(userCart.length === 0) { if(empty) empty.classList.remove('hidden'); if(container) container.classList.add('hidden'); if(footer) footer.classList.add('hidden'); isRendering=false; return; } if(empty) empty.classList.add('hidden'); if(container) container.classList.remove('hidden'); if(footer) footer.classList.remove('hidden'); let total = 0; container.innerHTML = userCart.map(item => { total += item.preco; return `<div class="card-horizontal fade-in"><div class="card-h-main"><img src="${item.imagem}" class="card-h-img"><div class="card-h-info"><h3>${item.nome}</h3><p class="subtitle" style="margin:0;">${item.parceiro}</p><div class="d-flex justify-content-between mt-2"><span style="font-weight:700; color:var(--dark-green); font-size:1.1rem;">${item.preco.toFixed(2)}€</span><button style="background:none; border:none; color:var(--danger); cursor:pointer; padding:5px; font-size:1.1rem;" onclick="removeFromCart(${item.cartId})"><i class="fa-solid fa-trash"></i></button></div></div></div></div>`; }).join(''); document.getElementById('cart-total').innerText = `${total.toFixed(2)}€`; isRendering=false; }
+
+function renderCart() { 
+    if (isRendering) return; 
+    isRendering = true; 
+    const userCart = cart.filter(c => c.userEmail === currentUser.email); 
+    const container = document.getElementById('cart-items-container'); 
+    const empty = document.getElementById('cart-empty'); 
+    const footer = document.getElementById('cart-footer'); 
+    document.getElementById('cart-count').innerText = `${userCart.length} itens`; 
+    
+    if(userCart.length === 0) { 
+        if(empty) empty.classList.remove('hidden'); 
+        if(container) container.classList.add('hidden'); 
+        if(footer) footer.classList.add('hidden'); 
+        isRendering=false; return; 
+    } 
+    if(empty) empty.classList.add('hidden'); 
+    if(container) container.classList.remove('hidden'); 
+    if(footer) footer.classList.remove('hidden'); 
+    
+    let total = 0; 
+    container.innerHTML = userCart.map(item => { 
+        total += item.preco; 
+        return `<div class="card-horizontal fade-in"><div class="card-h-main"><img src="${item.imagem}" class="card-h-img"><div class="card-h-info"><h3>${item.nome}</h3><p class="subtitle" style="margin:0;">${item.parceiro}</p><div class="d-flex justify-content-between mt-2"><span style="font-weight:700; color:var(--dark-green); font-size:1.1rem;">${item.preco.toFixed(2)}€</span><button style="background:none; border:none; color:var(--danger); cursor:pointer; padding:5px; font-size:1.1rem;" onclick="removeFromCart(${item.cartId})"><i class="fa-solid fa-trash"></i></button></div></div></div></div>`; 
+    }).join(''); 
+    document.getElementById('cart-total').innerText = `${total.toFixed(2)}€`; 
+    isRendering=false; 
+}
+
 function removeFromCart(cartId) { cart = cart.filter(c => c.cartId !== cartId); saveData(); updateCartBadge(); renderCart(); }
 function checkout() { const userCart = cart.filter(c => c.userEmail === currentUser.email); const total = userCart.reduce((s,i)=>s+i.preco,0); document.getElementById('pay-total-price').innerText = `${total.toFixed(2)}€`; document.getElementById('pay-phone-input').value = currentUser.phone || ''; document.getElementById('payment-modal').classList.remove('hidden'); }
 function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); }
+
+// --- Processamento de Pagamento (Agrupado por Parceiro) ---
 function processPayment() { 
     const userCart = cart.filter(c => c.userEmail === currentUser.email); 
     const btn = document.getElementById('btn-confirm-payment'); 
@@ -208,32 +243,26 @@ function processPayment() {
     setTimeout(() => { 
         const dataStr = new Date().toLocaleDateString('pt-PT', {day:'2-digit', month:'short', year:'numeric'}).replace(/ de /g, ' '); 
         
-        // Agrupar os itens do carrinho pelo Parceiro
         const gruposParceiro = {};
         userCart.forEach(item => {
             if (!gruposParceiro[item.parceiro]) gruposParceiro[item.parceiro] = [];
             gruposParceiro[item.parceiro].push(item);
             
-            // Abater o stock
             const bIdx = baskets.findIndex(b=>b.id===item.id); 
             if(bIdx !== -1 && baskets[bIdx].stock > 0) baskets[bIdx].stock--; 
         });
 
-        // Criar apenas UMA encomenda por cada parceiro
         Object.keys(gruposParceiro).forEach((parceiro, idx) => {
             const itens = gruposParceiro[parceiro];
-            const pin = Math.floor(1000 + Math.random() * 9000).toString(); // Um único PIN
+            const pin = Math.floor(1000 + Math.random() * 9000).toString(); 
             
-            // Calcular preços totais do grupo
             const precoTotal = itens.reduce((s, i) => s + i.preco, 0);
             const precoOriginalTotal = itens.reduce((s, i) => s + i.precoOriginal, 0);
             
-            // Construir o nome da encomenda 
             const contagemItens = {};
             itens.forEach(i => contagemItens[i.nome] = (contagemItens[i.nome] || 0) + 1);
             const nomeAgrupado = Object.entries(contagemItens).map(([nome, qtd]) => `${qtd}x ${nome}`).join(' + ');
 
-            // Adicionar a encomenda unificada
             orders.push({ 
                 orderId: Date.now() + idx, 
                 userEmail: currentUser.email, 
@@ -244,8 +273,8 @@ function processPayment() {
                 nome: nomeAgrupado,
                 preco: precoTotal,
                 precoOriginal: precoOriginalTotal,
-                imagem: itens[0].imagem, // Usa a imagem do primeiro cabaz do grupo
-                qtdCabazes: itens.length // Guarda o número de cabazes reais para estatísticas
+                imagem: itens[0].imagem, 
+                qtdCabazes: itens.length 
             }); 
         });
 
@@ -260,8 +289,7 @@ function processPayment() {
     }, 1500); 
 }
 
-
-// Encomendas (PIN visível)
+// --- Encomendas ---
 function renderOrders() { 
     if (isRendering) return; 
     isRendering = true; 
@@ -278,14 +306,12 @@ function renderOrders() {
         
         if (isLevantado) {
             if (o.rating) {
-                // Se o utilizador JÁ avaliou, mostra as estrelas preenchidas fixas
                 let starsHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     starsHtml += `<i class="${i <= o.rating ? 'fa-solid' : 'fa-regular'} fa-star" style="color:var(--medium-green);"></i>`;
                 }
                 footerHtml = `<div class="d-flex align-items-center w-100"><span style="font-size:0.9rem;">${starsHtml} <span style="color:var(--text-muted); margin-left:5px;">Obrigado pela tua avaliação!</span></span></div>`; 
             } else {
-                // Se AINDA NÃO avaliou, gera estrelas interativas (clicáveis)
                 let starsHtml = '';
                 for (let i = 1; i <= 5; i++) {
                     starsHtml += `<i class="fa-regular fa-star" style="color:var(--medium-green); cursor:pointer; font-size:1.3rem;" onclick="submeterAvaliacao(${o.orderId}, ${i})"></i>`;
@@ -293,7 +319,6 @@ function renderOrders() {
                 footerHtml = `<div class="d-flex flex-column w-100 gap-1"><span style="color:var(--text-dark); font-size:0.85rem; font-weight:600;">Avalia o teu cabaz:</span><div class="d-flex gap-2">${starsHtml}</div></div>`;
             }
         } else {
-            // Estado "Pronto para levantar": mantém o botão de simulação
             footerHtml = `<div class="d-flex flex-column w-100 gap-2"><span style="color:var(--text-muted); font-size:0.85rem;"><i class="fa-regular fa-clock"></i> Dirige-te ao parceiro para levantar o teu cabaz.</span><div class="pin-display mt-3 mb-2"><span class="pin-label">Código de Levantamento</span><span class="pin-code">${safePin}</span></div><button class="btn-primary w-100 mt-2" onclick="simularLevantamento(${o.orderId})">Simular levantamento</button></div>`; 
         }
         
@@ -303,31 +328,78 @@ function renderOrders() {
     isRendering = false; 
 }
 
-// Funçao para simular levantamento
 function simularLevantamento(orderId) {
     const orderIndex = orders.findIndex(o => o.orderId === orderId);
     if (orderIndex !== -1) {
         orders[orderIndex].status = 'levantado';
-        saveData(); // Atualiza a localStorage
-        isRendering = false; // Força a re-renderização
-        renderOrders(); // Atualiza a interface
+        saveData(); 
+        isRendering = false; 
+        renderOrders(); 
         showToast("Cabaz levantado com sucesso!");
     }
 }
 
-// funçao para fazer avaliaçoes
 function submeterAvaliacao(orderId, estrelas) {
     const orderIndex = orders.findIndex(o => o.orderId === orderId);
     if (orderIndex !== -1) {
-        orders[orderIndex].rating = estrelas; // Grava a nota escolhida no objeto da encomenda
-        saveData(); // Guarda na localStorage
-        isRendering = false; // Permite re-renderizar
-        renderOrders(); // Atualiza o ecrã
+        orders[orderIndex].rating = estrelas; 
+        saveData(); 
+        isRendering = false; 
+        renderOrders(); 
         showToast("Avaliação enviada com sucesso!");
     }
 }
 
 // --- Perfil ---
-function loadProfileData() { document.getElementById('profile-name').innerText = currentUser.name; document.getElementById('profile-email').innerText = currentUser.email; document.getElementById('profile-date').innerText = currentUser.memberSince || "Mai 2026"; const iniciais = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); document.getElementById('profile-avatar').innerText = iniciais; document.getElementById('header-avatar').innerText = iniciais; const userOrders = orders.filter(o=>o.userEmail===currentUser.email); let cabazes = userOrders.reduce((s, o) => s + (o.qtdCabazes || 1), 0); let poupado = userOrders.reduce((s, o) => s + ((o.precoOriginal || 0) - o.preco), 0); let co2 = cabazes * 2.5; document.getElementById('stat-cabazes').innerText = cabazes; document.getElementById('stat-poupado').innerText = `${poupado.toFixed(0)}€`; document.getElementById('stat-co2').innerText = `${co2.toFixed(1)}kg`; document.getElementById('edit-name').value = currentUser.name; document.getElementById('edit-phone').value = currentUser.phone || ''; if(!currentUser.preferences) currentUser.preferences = { alergias: [], dietas: [] }; document.querySelectorAll('input[name="alergia"]').forEach(cb => cb.checked = currentUser.preferences.alergias.includes(cb.value)); document.querySelectorAll('input[name="dieta"]').forEach(cb => cb.checked = currentUser.preferences.dietas.includes(cb.value)); }
-document.getElementById('preferences-form').addEventListener('submit', (e) => { e.preventDefault(); const newName = document.getElementById('edit-name').value.trim(); const newPhone = document.getElementById('edit-phone').value.trim(); if(newName.length < 3) return showToast("Nome demasiado curto.", "error"); if(!/^\d{9}$/.test(newPhone)) return showToast("O telemóvel tem de ter 9 dígitos.", "error"); currentUser.name = newName; currentUser.phone = newPhone; const alergias = Array.from(document.querySelectorAll('input[name="alergia"]:checked')).map(cb=>cb.value); const dietas = Array.from(document.querySelectorAll('input[name="dieta"]:checked')).map(cb=>cb.value); currentUser.preferences = { alergias, dietas }; const idx = users.findIndex(u=>u.email===currentUser.email); if(idx>-1) users[idx]=currentUser; saveData(); loadProfileData(); showToast("Alterações guardadas com sucesso!"); });
-function showToast(msg, type='success') { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `toast ${type}`; const icon = type==='success' ? 'fa-circle-check' : 'fa-triangle-exclamation'; const color = type==='success' ? 'var(--medium-green)' : 'var(--danger)'; t.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size: 1.2rem;"></i> <span>${msg}</span>`; c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000); }
+function loadProfileData() { 
+    document.getElementById('profile-name').innerText = currentUser.name; 
+    document.getElementById('profile-email').innerText = currentUser.email; 
+    document.getElementById('profile-date').innerText = currentUser.memberSince || "Mai 2026"; 
+    const iniciais = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); 
+    document.getElementById('profile-avatar').innerText = iniciais; 
+    document.getElementById('header-avatar').innerText = iniciais; 
+    const userOrders = orders.filter(o=>o.userEmail===currentUser.email); 
+    
+    let cabazes = userOrders.reduce((s, o) => s + (o.qtdCabazes || 1), 0); 
+    let poupado = userOrders.reduce((s, o) => s + ((o.precoOriginal || 0) - o.preco), 0); 
+    let co2 = cabazes * 2.5; 
+    
+    document.getElementById('stat-cabazes').innerText = cabazes; 
+    document.getElementById('stat-poupado').innerText = `${poupado.toFixed(0)}€`; 
+    document.getElementById('stat-co2').innerText = `${co2.toFixed(1)}kg`; 
+    document.getElementById('edit-name').value = currentUser.name; 
+    document.getElementById('edit-phone').value = currentUser.phone || ''; 
+    
+    if(!currentUser.preferences) currentUser.preferences = { alergias: [], dietas: [] }; 
+    document.querySelectorAll('input[name="alergia"]').forEach(cb => cb.checked = currentUser.preferences.alergias.includes(cb.value)); 
+    document.querySelectorAll('input[name="dieta"]').forEach(cb => cb.checked = currentUser.preferences.dietas.includes(cb.value)); 
+}
+
+document.getElementById('preferences-form').addEventListener('submit', (e) => { 
+    e.preventDefault(); 
+    const newName = document.getElementById('edit-name').value.trim(); 
+    const newPhone = document.getElementById('edit-phone').value.trim(); 
+    if(newName.length < 3) return showToast("Nome demasiado curto.", "error"); 
+    if(!/^\d{9}$/.test(newPhone)) return showToast("O telemóvel tem de ter 9 dígitos.", "error"); 
+    currentUser.name = newName; 
+    currentUser.phone = newPhone; 
+    const alergias = Array.from(document.querySelectorAll('input[name="alergia"]:checked')).map(cb=>cb.value); 
+    const dietas = Array.from(document.querySelectorAll('input[name="dieta"]:checked')).map(cb=>cb.value); 
+    currentUser.preferences = { alergias, dietas }; 
+    const idx = users.findIndex(u=>u.email===currentUser.email); 
+    if(idx>-1) users[idx]=currentUser; 
+    saveData(); 
+    loadProfileData(); 
+    showToast("Alterações guardadas com sucesso!"); 
+});
+
+function showToast(msg, type='success') { 
+    const c = document.getElementById('toast-container'); 
+    const t = document.createElement('div'); 
+    t.className = `toast ${type}`; 
+    const icon = type==='success' ? 'fa-circle-check' : 'fa-triangle-exclamation'; 
+    const color = type==='success' ? 'var(--medium-green)' : 'var(--danger)'; 
+    t.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size: 1.2rem;"></i> <span>${msg}</span>`; 
+    c.appendChild(t); 
+    setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000); 
+}
