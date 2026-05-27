@@ -179,7 +179,67 @@ function renderCart() { if (isRendering) return; isRendering = true; const userC
 function removeFromCart(cartId) { cart = cart.filter(c => c.cartId !== cartId); saveData(); updateCartBadge(); renderCart(); }
 function checkout() { const userCart = cart.filter(c => c.userEmail === currentUser.email); const total = userCart.reduce((s,i)=>s+i.preco,0); document.getElementById('pay-total-price').innerText = `${total.toFixed(2)}€`; document.getElementById('pay-phone-input').value = currentUser.phone || ''; document.getElementById('payment-modal').classList.remove('hidden'); }
 function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); }
-function processPayment() { const userCart = cart.filter(c => c.userEmail === currentUser.email); const btn = document.getElementById('btn-confirm-payment'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A processar...'; btn.disabled = true; setTimeout(() => { const dataStr = new Date().toLocaleDateString('pt-PT', {day:'2-digit', month:'short', year:'numeric'}).replace(/ de /g, ' '); userCart.forEach((item, idx) => { const pin = Math.floor(1000+Math.random()*9000).toString(); orders.push({ ...item, orderId: Date.now()+idx, status: 'pronto', pin: pin, dataCompra: dataStr }); const bIdx = baskets.findIndex(b=>b.id===item.id); if(bIdx!==-1 && baskets[bIdx].stock>0) baskets[bIdx].stock--; }); cart = cart.filter(c=>c.userEmail!==currentUser.email); saveData(); updateCartBadge(); btn.innerHTML = 'Pagar Agora'; btn.disabled=false; closePaymentModal(); showToast("Pagamento aprovado! Encomendas geradas."); showView('orders-view'); }, 1500); }
+function processPayment() { 
+    const userCart = cart.filter(c => c.userEmail === currentUser.email); 
+    const btn = document.getElementById('btn-confirm-payment'); 
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A processar...'; 
+    btn.disabled = true; 
+    
+    setTimeout(() => { 
+        const dataStr = new Date().toLocaleDateString('pt-PT', {day:'2-digit', month:'short', year:'numeric'}).replace(/ de /g, ' '); 
+        
+        // Agrupar os itens do carrinho pelo Parceiro
+        const gruposParceiro = {};
+        userCart.forEach(item => {
+            if (!gruposParceiro[item.parceiro]) gruposParceiro[item.parceiro] = [];
+            gruposParceiro[item.parceiro].push(item);
+            
+            // Abater o stock
+            const bIdx = baskets.findIndex(b=>b.id===item.id); 
+            if(bIdx !== -1 && baskets[bIdx].stock > 0) baskets[bIdx].stock--; 
+        });
+
+        // Criar apenas UMA encomenda por cada parceiro
+        Object.keys(gruposParceiro).forEach((parceiro, idx) => {
+            const itens = gruposParceiro[parceiro];
+            const pin = Math.floor(1000 + Math.random() * 9000).toString(); // Um único PIN
+            
+            // Calcular preços totais do grupo
+            const precoTotal = itens.reduce((s, i) => s + i.preco, 0);
+            const precoOriginalTotal = itens.reduce((s, i) => s + i.precoOriginal, 0);
+            
+            // Construir o nome da encomenda 
+            const contagemItens = {};
+            itens.forEach(i => contagemItens[i.nome] = (contagemItens[i.nome] || 0) + 1);
+            const nomeAgrupado = Object.entries(contagemItens).map(([nome, qtd]) => `${qtd}x ${nome}`).join(' + ');
+
+            // Adicionar a encomenda unificada
+            orders.push({ 
+                orderId: Date.now() + idx, 
+                userEmail: currentUser.email, 
+                status: 'pronto', 
+                pin: pin, 
+                dataCompra: dataStr, 
+                parceiro: parceiro,
+                nome: nomeAgrupado,
+                preco: precoTotal,
+                precoOriginal: precoOriginalTotal,
+                imagem: itens[0].imagem, // Usa a imagem do primeiro cabaz do grupo
+                qtdCabazes: itens.length // Guarda o número de cabazes reais para estatísticas
+            }); 
+        });
+
+        cart = cart.filter(c => c.userEmail !== currentUser.email); 
+        saveData(); 
+        updateCartBadge(); 
+        btn.innerHTML = 'Pagar Agora'; 
+        btn.disabled = false; 
+        closePaymentModal(); 
+        showToast("Pagamento aprovado! Encomenda(s) gerada(s)."); 
+        showView('orders-view'); 
+    }, 1500); 
+}
+
 
 // Encomendas (PIN visível)
 function renderOrders() { 
@@ -248,6 +308,6 @@ function submeterAvaliacao(orderId, estrelas) {
 }
 
 // --- Perfil ---
-function loadProfileData() { document.getElementById('profile-name').innerText = currentUser.name; document.getElementById('profile-email').innerText = currentUser.email; document.getElementById('profile-date').innerText = currentUser.memberSince || "Mai 2026"; const iniciais = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); document.getElementById('profile-avatar').innerText = iniciais; document.getElementById('header-avatar').innerText = iniciais; const userOrders = orders.filter(o=>o.userEmail===currentUser.email); let cabazes = userOrders.length; let poupado = userOrders.reduce((s,o)=>s+((o.precoOriginal||0)-o.preco),0); let co2 = userOrders.length*2.5; document.getElementById('stat-cabazes').innerText = cabazes; document.getElementById('stat-poupado').innerText = `${poupado.toFixed(0)}€`; document.getElementById('stat-co2').innerText = `${co2.toFixed(1)}kg`; document.getElementById('edit-name').value = currentUser.name; document.getElementById('edit-phone').value = currentUser.phone || ''; if(!currentUser.preferences) currentUser.preferences = { alergias: [], dietas: [] }; document.querySelectorAll('input[name="alergia"]').forEach(cb => cb.checked = currentUser.preferences.alergias.includes(cb.value)); document.querySelectorAll('input[name="dieta"]').forEach(cb => cb.checked = currentUser.preferences.dietas.includes(cb.value)); }
+function loadProfileData() { document.getElementById('profile-name').innerText = currentUser.name; document.getElementById('profile-email').innerText = currentUser.email; document.getElementById('profile-date').innerText = currentUser.memberSince || "Mai 2026"; const iniciais = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase(); document.getElementById('profile-avatar').innerText = iniciais; document.getElementById('header-avatar').innerText = iniciais; const userOrders = orders.filter(o=>o.userEmail===currentUser.email); let cabazes = userOrders.reduce((s, o) => s + (o.qtdCabazes || 1), 0); let poupado = userOrders.reduce((s, o) => s + ((o.precoOriginal || 0) - o.preco), 0); let co2 = cabazes * 2.5; document.getElementById('stat-cabazes').innerText = cabazes; document.getElementById('stat-poupado').innerText = `${poupado.toFixed(0)}€`; document.getElementById('stat-co2').innerText = `${co2.toFixed(1)}kg`; document.getElementById('edit-name').value = currentUser.name; document.getElementById('edit-phone').value = currentUser.phone || ''; if(!currentUser.preferences) currentUser.preferences = { alergias: [], dietas: [] }; document.querySelectorAll('input[name="alergia"]').forEach(cb => cb.checked = currentUser.preferences.alergias.includes(cb.value)); document.querySelectorAll('input[name="dieta"]').forEach(cb => cb.checked = currentUser.preferences.dietas.includes(cb.value)); }
 document.getElementById('preferences-form').addEventListener('submit', (e) => { e.preventDefault(); const newName = document.getElementById('edit-name').value.trim(); const newPhone = document.getElementById('edit-phone').value.trim(); if(newName.length < 3) return showToast("Nome demasiado curto.", "error"); if(!/^\d{9}$/.test(newPhone)) return showToast("O telemóvel tem de ter 9 dígitos.", "error"); currentUser.name = newName; currentUser.phone = newPhone; const alergias = Array.from(document.querySelectorAll('input[name="alergia"]:checked')).map(cb=>cb.value); const dietas = Array.from(document.querySelectorAll('input[name="dieta"]:checked')).map(cb=>cb.value); currentUser.preferences = { alergias, dietas }; const idx = users.findIndex(u=>u.email===currentUser.email); if(idx>-1) users[idx]=currentUser; saveData(); loadProfileData(); showToast("Alterações guardadas com sucesso!"); });
 function showToast(msg, type='success') { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `toast ${type}`; const icon = type==='success' ? 'fa-circle-check' : 'fa-triangle-exclamation'; const color = type==='success' ? 'var(--medium-green)' : 'var(--danger)'; t.innerHTML = `<i class="fa-solid ${icon}" style="color:${color}; font-size: 1.2rem;"></i> <span>${msg}</span>`; c.appendChild(t); setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000); }
