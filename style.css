@@ -176,6 +176,18 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
 .allergen-chip i {
     font-size: 0.7rem;
 }
+.allergen-chip.danger-chip {
+    background: #fff5f5;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    animation: pulseAlert 2s infinite;
+}
+
+@keyframes pulseAlert {
+    0% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(230, 57, 70, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0); }
+}
 
 /* --- Cartões Horizontais (Carrinho e Encomendas) --- */
 .card-horizontal { background: white; border-radius: var(--radius); padding: 1.2rem; display: flex; gap: 1rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border); flex-direction: column; }
