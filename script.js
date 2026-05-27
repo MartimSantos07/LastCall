@@ -156,6 +156,26 @@ function openBasketDetail(id) {
     document.getElementById('detail-description').innerText = basket.descricao;
     document.getElementById('detail-old-price').innerText = `${basket.precoOriginal.toFixed(2)}€`;
     
+    // Mostrar alergénios com aviso a vermelho se o utilizador for alérgico
+    const allergenSection = document.getElementById('allergen-section');
+    const allergenChips = document.getElementById('allergen-chips');
+    if (basket.alergenos && basket.alergenos.length > 0) {
+        const userAlergias = (currentUser && currentUser.preferences && currentUser.preferences.alergias) ? currentUser.preferences.alergias : [];
+        
+        allergenChips.innerHTML = basket.alergenos.map(a => {
+            const isAllergic = userAlergias.includes(a); // Verifica se há match
+            const chipClass = isAllergic ? 'allergen-chip danger-chip' : 'allergen-chip';
+            const icon = isAllergic ? 'fa-triangle-exclamation' : 'fa-circle-exclamation';
+            return `<span class="${chipClass}"><i class="fa-solid ${icon}"></i> ${a}</span>`;
+        }).join('');
+        allergenSection.style.display = 'block';
+    } else {
+        allergenSection.style.display = 'none';
+    }
+    
+    updateDetailPrice();
+    showView('basket-detail-view');
+}
     // Mostrar alergénios
     const allergenSection = document.getElementById('allergen-section');
     const allergenChips = document.getElementById('allergen-chips');
