@@ -8,6 +8,7 @@
     --text-dark: #2C3E35;
     --text-muted: #6B7C73;
     --danger: #E63946;
+    --warning-green: #2e7d32;
     --shadow-sm: 0 4px 6px -1px rgba(26, 61, 43, 0.1);
     --shadow-md: 0 10px 25px -5px rgba(26, 61, 43, 0.15);
     --radius: 16px;
@@ -35,7 +36,7 @@ body { background-color: var(--cream); color: var(--text-dark); display: flex; f
 .gap-3 { gap: 1rem; }
 
 /* --- Layout Principal --- */
-main { padding: 1rem 1.5rem 1.5rem; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 100px; /* espaço para bottom-nav em mobile */ }
+main { padding: 1rem 1.5rem 1.5rem; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 100px; }
 .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; }
 .section-header h2 { color: var(--dark-green); font-size: 1.3rem; font-weight: 700; }
 .text-link { background: none; border: none; color: var(--medium-green); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: var(--transition); }
@@ -50,14 +51,14 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
 .avatar-circle { width: 40px; height: 40px; background: var(--light-green); color: var(--dark-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: var(--transition); }
 .avatar-circle:hover { transform: scale(1.05); }
 
-/* Desktop Navigation (visível apenas em desktop) */
+/* Desktop Navigation */
 .desktop-nav { display: none; gap: 1rem; align-items: center; }
 .nav-item-desktop { background: none; border: none; color: rgba(255,255,255,0.8); font-size: 1rem; font-weight: 500; cursor: pointer; transition: var(--transition); padding: 0.5rem 1rem; border-radius: 40px; }
 .nav-item-desktop:hover { color: white; background: rgba(255,255,255,0.1); }
 .nav-item-desktop.active { background: var(--light-green); color: var(--dark-green); font-weight: 600; }
 .cart-badge-desk { background: var(--danger); color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; font-weight: 700; margin-left: 5px; }
 
-/* Bottom Navigation (apenas para mobile) */
+/* Bottom Navigation (mobile) */
 #bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--cream); display: flex; justify-content: space-around; padding: 0.8rem 0; box-shadow: 0 -4px 15px rgba(0,0,0,0.08); z-index: 100; border-top: 1px solid var(--border); }
 .nav-item { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: 500; cursor: pointer; position: relative; width: 25%; }
 .nav-item i { font-size: 1.4rem; transition: var(--transition); }
@@ -65,7 +66,6 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
 .nav-item.active i { transform: translateY(-2px); }
 .cart-badge { position: absolute; top: -5px; right: 20px; background: var(--dark-green); color: white; font-size: 0.65rem; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;}
 
-/* Media Queries: desktop */
 @media (min-width: 769px) {
     #bottom-nav { display: none !important; }
     .desktop-nav { display: flex; }
@@ -74,7 +74,7 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
     .header-container { flex-wrap: nowrap; }
 }
 
-/* --- Scrolls Horizontais (Categorias e Parceiros) --- */
+/* --- Scrolls Horizontais --- */
 .horizontal-scroll { display: flex; overflow-x: auto; gap: 1rem; padding-bottom: 0.5rem; scrollbar-width: none; }
 .horizontal-scroll::-webkit-scrollbar { display: none; }
 .cat-btn { background: white; border: 1px solid var(--border); padding: 0.8rem 1.2rem; border-radius: 12px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 8px; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm); white-space: nowrap; }
@@ -87,7 +87,7 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
 .partner-name { font-size: 0.85rem; font-weight: 600; color: var(--dark-green); line-height: 1.2; }
 .partner-dist { background: var(--border); color: var(--text-dark); font-size: 0.7rem; padding: 3px 8px; border-radius: 10px; font-weight: 500; }
 
-/* --- Grelha de Cabazes (Cards) --- */
+/* --- Grelha de Cabazes --- */
 .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
 .grid-col-1 { display: grid; grid-template-columns: 1fr; gap: 1rem; max-width: 800px; margin: 0 auto; }
 .card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; cursor: pointer; transition: var(--transition); }
@@ -104,7 +104,7 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
 .price { font-size: 1.5rem; font-weight: 700; color: var(--dark-green); }
 .price-old { font-size: 0.95rem; color: var(--text-muted); text-decoration: line-through; }
 
-/* --- DETALHE DO CABAZ (CORRIGIDO + ALERGENIOS) --- */
+/* --- DETALHE DO CABAZ --- */
 #basket-detail-view { display: flex; justify-content: center; align-items: center; padding: 1rem; }
 .detail-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-md); max-width: 100%; width: 100%; margin: 0 auto; display: flex; flex-direction: column; }
 .detail-img-container { position: relative; width: 100%; height: auto; background: #e8e0d5; overflow: hidden; aspect-ratio: 1 / 1; max-height: 400px; }
@@ -131,7 +131,6 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
 .btn-add-cart { background: var(--dark-green); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; font-weight: 700; cursor: pointer; transition: var(--transition); white-space: nowrap; }
 .btn-add-cart:hover { background: var(--medium-green); transform: scale(1.02); }
 
-/* Desktop ajustes detalhe */
 @media (min-width: 769px) {
     .detail-card { flex-direction: row; max-width: 1000px; }
     .detail-img-container { width: 45%; aspect-ratio: 4/3; max-height: none; }
@@ -141,7 +140,7 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
     .btn-add-cart { padding: 0.7rem 1.8rem; }
 }
 
-/* --- Alergénios --- */
+/* --- Alergénios (vermelho) --- */
 .allergen-section {
     background: #fff8e7;
     border-left: 4px solid #ffaa00;
@@ -173,14 +172,51 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
     align-items: center;
     gap: 5px;
 }
-.allergen-chip i {
-    font-size: 0.7rem;
-}
+.allergen-chip i { font-size: 0.7rem; }
 .allergen-chip.danger-chip {
     background: #fff5f5;
     color: var(--danger);
     border: 1px solid var(--danger);
     animation: pulseAlert 2s infinite;
+}
+
+/* --- Preferências Alimentares (verde) --- */
+.pref-section {
+    background: #e8f5e9;
+    border-left: 4px solid var(--medium-green);
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.5rem;
+}
+.pref-section h3 {
+    font-size: 0.9rem;
+    color: var(--warning-green);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.pref-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.pref-chip {
+    background: #ffffffcc;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--warning-green);
+    border: 1px solid #a5d6a7;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.pref-chip.warning-chip {
+    background: #c8e6c9;
+    color: #1b5e20;
+    border: 1px solid #4caf50;
 }
 
 @keyframes pulseAlert {
@@ -189,7 +225,7 @@ header { background-color: var(--dark-green); color: white; padding: 1rem 1.5rem
     100% { box-shadow: 0 0 0 0 rgba(230, 57, 70, 0); }
 }
 
-/* --- Cartões Horizontais (Carrinho e Encomendas) --- */
+/* --- Cartões Horizontais --- */
 .card-horizontal { background: white; border-radius: var(--radius); padding: 1.2rem; display: flex; gap: 1rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border); flex-direction: column; }
 .card-h-main { display: flex; gap: 1rem; }
 .card-h-img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; }
