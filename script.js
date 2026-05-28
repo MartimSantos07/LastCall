@@ -1,16 +1,16 @@
-// --- Dados Base com Alergénios ---
+// --- Dados Base com Alergénios e Preferências Alimentares ---
 const defaultBaskets = [
-    { id: 1, nome: "Cabaz Surpresa Alimentar", parceiro: "Pingo Doce", preco: 3.99, precoOriginal: 12.00, desconto: "-67%", poupado: "8.01€", stock: 4, categoria: "Alimentação", horario: "Hoje, 18h–20h", avaliacao: 4.6, numAvaliacoes: 88, descricao: "Cabaz surpresa com produtos alimentares frescos próximos do prazo de validade. Inclui legumes, fruta e produtos de mercearia.", imagem: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Soja"] },
-    { id: 2, nome: "Misto de Padaria Diário", parceiro: "Padaria São João", preco: 2.50, precoOriginal: 8.00, desconto: "-69%", poupado: "5.50€", stock: 3, categoria: "Padaria", horario: "Hoje, 19h–21h", avaliacao: 4.8, numAvaliacoes: 124, descricao: "Pão fresco que sobrou do dia, bolos sortidos e salgados.", imagem: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Ovos", "Lactose"] },
-    { id: 3, nome: "Refeição Completa", parceiro: "Restaurante Verde", preco: 4.50, precoOriginal: 10.00, desconto: "-55%", poupado: "5.50€", stock: 2, categoria: "Feitos", horario: "Amanhã, 12h–14h", avaliacao: 4.9, numAvaliacoes: 45, descricao: "Sobra de refeições preparadas no dia. Pode incluir pratos de carne ou vegetarianos.", imagem: "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Lactose", "Ovos", "Soja"] },
-    { id: 4, nome: "Pack Higiene Eco", parceiro: "Farmácia Saúde+", preco: 5.00, precoOriginal: 15.00, desconto: "-66%", poupado: "10.00€", stock: 5, categoria: "Higiene", horario: "Hoje, 14h–19h", avaliacao: 4.5, numAvaliacoes: 32, descricao: "Produtos de higiene pessoal com embalagens ligeiramente danificadas.", imagem: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: [] },
-    { id: 5, nome: "Cabaz Fruta Imperfeita", parceiro: "Pingo Doce", preco: 2.99, precoOriginal: 7.50, desconto: "-60%", poupado: "4.51€", stock: 6, categoria: "Alimentação", horario: "Hoje, 17h–20h", avaliacao: 4.3, numAvaliacoes: 15, descricao: "Fruta fresca, deliciosa, mas com pequenos defeitos estéticos. Ideal para sumos.", imagem: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: [] },
-    { id: 6, nome: "Sortido Doçaria", parceiro: "Padaria São João", preco: 3.50, precoOriginal: 9.00, desconto: "-61%", poupado: "5.50€", stock: 1, categoria: "Padaria", horario: "Hoje, 19h–21h", avaliacao: 4.7, numAvaliacoes: 67, descricao: "Uma seleção dos melhores doces conventuais que não foram vendidos durante o dia.", imagem: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Ovos", "Lactose", "Frutos secos"] },
-    { id: 7, nome: "Cabaz de Legumes Bio", parceiro: "Feira da Terra", preco: 4.00, precoOriginal: 10.00, desconto: "-60%", poupado: "6.00€", stock: 8, categoria: "Alimentação", horario: "Hoje, 16h–19h", avaliacao: 4.4, numAvaliacoes: 23, descricao: "Legumes biológicos com pequenas imperfeições. Frescos e saborosos.", imagem: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: [] },
-    { id: 8, nome: "Cabaz de Pão e Bolos", parceiro: "Padaria do Bairro", preco: 2.80, precoOriginal: 7.00, desconto: "-60%", poupado: "4.20€", stock: 5, categoria: "Padaria", horario: "Hoje, 19h–21h", avaliacao: 4.9, numAvaliacoes: 56, descricao: "Variedade de pães e bolos do dia que não foram vendidos.", imagem: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Ovos", "Lactose"] },
-    { id: 9, nome: "Cabaz de Sushi", parceiro: "Sushi House", preco: 6.50, precoOriginal: 18.00, desconto: "-64%", poupado: "11.50€", stock: 2, categoria: "Feitos", horario: "Hoje, 20h–22h", avaliacao: 4.7, numAvaliacoes: 41, descricao: "Sushi fresco preparado no dia. Pode conter peixe, vegetais e arroz.", imagem: "https://images.unsplash.com/photo-1553621042-f6e147245754?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Peixe", "Marisco", "Soja"] },
-    { id: 10, nome: "Cabaz Pet Completo", parceiro: "Pingo Doce", preco: 14.99, precoOriginal: 37.00, desconto: "-60%", poupado: "22€", stock: 5, categoria: "Animal", horario: "Hoje, 19h–21h", avaliacao: 4.9, numAvaliacoes: 50, descricao: "Variedade de bens para animais como ração, biscoitos, brinquedos,etc.", imagem: "https://www.millenniumbcp.pt/media/a5mn1wpg/petis-i-hero-products-922x1144.webp", alergenos: ["Glúten", "Ovos", "Lactose"] },
-    { id: 11, nome: "Cabaz Bebé Feliz", parceiro: "Farmácia Saúde+", preco: 19.99, precoOriginal: 65.00, desconto: "-69%", poupado: "45.01€", stock: 6, categoria: "Higiene", horario: "Hoje, 19h–22h", avaliacao: 4.7, numAvaliacoes: 56, descricao: "Produtos mensais essenciais para um bebé, fraldas, toalhitas, creme.", imagem: "https://www.nanny-care.com/img/modules/oh_nc_news/news/151_picture.jpg", alergenos: ["Cola", "Silicone", "Fragrâncias"] }
+    { id: 1, nome: "Cabaz Surpresa Alimentar", parceiro: "Pingo Doce", preco: 3.99, precoOriginal: 12.00, desconto: "-67%", poupado: "8.01€", stock: 4, categoria: "Alimentação", horario: "Hoje, 18h–20h", avaliacao: 4.6, numAvaliacoes: 88, descricao: "Cabaz surpresa com produtos alimentares frescos próximos do prazo de validade. Inclui legumes, fruta e produtos de mercearia.", imagem: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Soja"], incompativelCom: ["Vegetariano", "Vegan"] },
+    { id: 2, nome: "Misto de Padaria Diário", parceiro: "Padaria São João", preco: 2.50, precoOriginal: 8.00, desconto: "-69%", poupado: "5.50€", stock: 3, categoria: "Padaria", horario: "Hoje, 19h–21h", avaliacao: 4.8, numAvaliacoes: 124, descricao: "Pão fresco que sobrou do dia, bolos sortidos e salgados.", imagem: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Ovos", "Lactose"], incompativelCom: ["Vegan", "Sem Lactose", "Sem Glúten"] },
+    { id: 3, nome: "Refeição Completa", parceiro: "Restaurante Verde", preco: 4.50, precoOriginal: 10.00, desconto: "-55%", poupado: "5.50€", stock: 2, categoria: "Feitos", horario: "Amanhã, 12h–14h", avaliacao: 4.9, numAvaliacoes: 45, descricao: "Sobra de refeições preparadas no dia. Pode incluir pratos de carne ou vegetarianos.", imagem: "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Lactose", "Ovos", "Soja"], incompativelCom: ["Vegetariano", "Vegan", "Sem Glúten", "Sem Lactose"] },
+    { id: 4, nome: "Pack Higiene Eco", parceiro: "Farmácia Saúde+", preco: 5.00, precoOriginal: 15.00, desconto: "-66%", poupado: "10.00€", stock: 5, categoria: "Higiene", horario: "Hoje, 14h–19h", avaliacao: 4.5, numAvaliacoes: 32, descricao: "Produtos de higiene pessoal com embalagens ligeiramente danificadas.", imagem: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: [], incompativelCom: [] },
+    { id: 5, nome: "Cabaz Fruta Imperfeita", parceiro: "Pingo Doce", preco: 2.99, precoOriginal: 7.50, desconto: "-60%", poupado: "4.51€", stock: 6, categoria: "Alimentação", horario: "Hoje, 17h–20h", avaliacao: 4.3, numAvaliacoes: 15, descricao: "Fruta fresca, deliciosa, mas com pequenos defeitos estéticos. Ideal para sumos.", imagem: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: [], incompativelCom: [] },
+    { id: 6, nome: "Sortido Doçaria", parceiro: "Padaria São João", preco: 3.50, precoOriginal: 9.00, desconto: "-61%", poupado: "5.50€", stock: 1, categoria: "Padaria", horario: "Hoje, 19h–21h", avaliacao: 4.7, numAvaliacoes: 67, descricao: "Uma seleção dos melhores doces conventuais que não foram vendidos durante o dia.", imagem: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Ovos", "Lactose", "Frutos secos"], incompativelCom: ["Vegan", "Sem Lactose", "Sem Glúten"] },
+    { id: 7, nome: "Cabaz de Legumes Bio", parceiro: "Feira da Terra", preco: 4.00, precoOriginal: 10.00, desconto: "-60%", poupado: "6.00€", stock: 8, categoria: "Alimentação", horario: "Hoje, 16h–19h", avaliacao: 4.4, numAvaliacoes: 23, descricao: "Legumes biológicos com pequenas imperfeições. Frescos e saborosos.", imagem: "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: [], incompativelCom: [] },
+    { id: 8, nome: "Cabaz de Pão e Bolos", parceiro: "Padaria do Bairro", preco: 2.80, precoOriginal: 7.00, desconto: "-60%", poupado: "4.20€", stock: 5, categoria: "Padaria", horario: "Hoje, 19h–21h", avaliacao: 4.9, numAvaliacoes: 56, descricao: "Variedade de pães e bolos do dia que não foram vendidos.", imagem: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Glúten", "Ovos", "Lactose"], incompativelCom: ["Vegan", "Sem Lactose", "Sem Glúten"] },
+    { id: 9, nome: "Cabaz de Sushi", parceiro: "Sushi House", preco: 6.50, precoOriginal: 18.00, desconto: "-64%", poupado: "11.50€", stock: 2, categoria: "Feitos", horario: "Hoje, 20h–22h", avaliacao: 4.7, numAvaliacoes: 41, descricao: "Sushi fresco preparado no dia. Pode conter peixe, vegetais e arroz.", imagem: "https://images.unsplash.com/photo-1553621042-f6e147245754?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80", alergenos: ["Peixe", "Marisco", "Soja"], incompativelCom: ["Vegetariano", "Vegan"] },
+    { id: 10, nome: "Cabaz Pet Completo", parceiro: "Pingo Doce", preco: 14.99, precoOriginal: 37.00, desconto: "-60%", poupado: "22€", stock: 5, categoria: "Animal", horario: "Hoje, 19h–21h", avaliacao: 4.9, numAvaliacoes: 50, descricao: "Variedade de bens para animais como ração, biscoitos, brinquedos,etc.", imagem: "https://www.millenniumbcp.pt/media/a5mn1wpg/petis-i-hero-products-922x1144.webp", alergenos: ["Glúten", "Ovos", "Lactose"], incompativelCom: [] },
+    { id: 11, nome: "Cabaz Bebé Feliz", parceiro: "Farmácia Saúde+", preco: 19.99, precoOriginal: 65.00, desconto: "-69%", poupado: "45.01€", stock: 6, categoria: "Higiene", horario: "Hoje, 19h–22h", avaliacao: 4.7, numAvaliacoes: 56, descricao: "Produtos mensais essenciais para um bebé, fraldas, toalhitas, creme.", imagem: "https://www.nanny-care.com/img/modules/oh_nc_news/news/151_picture.jpg", alergenos: ["Cola", "Silicone", "Fragrâncias"], incompativelCom: [] }
 ];
 const mockPartners = [
     { nome: "Pingo Doce", dist: "0.3 km", img: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" },
@@ -23,7 +23,7 @@ let currentUser = null, users = [], orders = [], cart = [], baskets = [];
 let currentCategory = 'Todas', currentPartnerFilter = null, viewBasketId = null, viewBasketQty = 1;
 let isRendering = false;
 
-// --- Inicialização com FORCE UPDATE dos cabazes ---
+// --- Inicialização ---
 window.onload = () => {
     try {
         users = JSON.parse(localStorage.getItem('lastcall_users')) || [];
@@ -156,7 +156,7 @@ function renderBaskets() {
 }
 function filterBaskets() { renderBaskets(); }
 
-// --- Detalhe do Cabaz (com alergénios e destaques a vermelho) ---
+// --- Detalhe do Cabaz (com alergénios e preferências alimentares) ---
 function openBasketDetail(id) {
     const basket = baskets.find(b => b.id === id);
     if(!basket) return;
@@ -173,7 +173,7 @@ function openBasketDetail(id) {
     document.getElementById('detail-description').innerText = basket.descricao;
     document.getElementById('detail-old-price').innerText = `${basket.precoOriginal.toFixed(2)}€`;
     
-    // Mostrar alergénios com aviso a vermelho se o utilizador for alérgico
+    // Alergénios (vermelho)
     const allergenSection = document.getElementById('allergen-section');
     const allergenChips = document.getElementById('allergen-chips');
     if (basket.alergenos && basket.alergenos.length > 0) {
@@ -188,6 +188,23 @@ function openBasketDetail(id) {
         allergenSection.style.display = 'block';
     } else {
         allergenSection.style.display = 'none';
+    }
+    
+    // Preferências Alimentares (verde)
+    const prefSection = document.getElementById('pref-section');
+    const prefChips = document.getElementById('pref-chips');
+    if (basket.incompativelCom && basket.incompativelCom.length > 0) {
+        const userDietas = (currentUser && currentUser.preferences && currentUser.preferences.dietas) ? currentUser.preferences.dietas : [];
+        const incompatibilidades = basket.incompativelCom.filter(pref => userDietas.includes(pref));
+        
+        if (incompatibilidades.length > 0) {
+            prefChips.innerHTML = incompatibilidades.map(pref => `<span class="pref-chip warning-chip"><i class="fa-solid fa-leaf"></i> ${pref}</span>`).join('');
+            prefSection.style.display = 'block';
+        } else {
+            prefSection.style.display = 'none';
+        }
+    } else {
+        prefSection.style.display = 'none';
     }
     
     updateDetailPrice();
