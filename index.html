@@ -144,7 +144,7 @@
             <div id="baskets-container" class="grid-container"></div>
         </section>
 
-        <!-- DETALHE DO CABAZ (com alergénios) -->
+        <!-- DETALHE DO CABAZ (com alergénios e preferências alimentares) -->
         <section id="basket-detail-view" class="view hidden fade-in">
             <div class="detail-card">
                 <div class="detail-img-container">
@@ -161,10 +161,16 @@
                         <div class="info-box"><i class="fa-regular fa-circle-check"></i><div><span class="info-label">Disponíveis</span><span class="info-value" id="detail-stock">0 cabazes</span></div></div>
                     </div>
                     
-                    <!-- SECÇÃO DE ALERGENIOS -->
+                    <!-- SECÇÃO DE ALERGENIOS (vermelho) -->
                     <div class="allergen-section mb-4" id="allergen-section" style="display: none;">
                         <h3><i class="fa-solid fa-triangle-exclamation"></i> Alergénios presentes</h3>
                         <div class="allergen-chips" id="allergen-chips"></div>
+                    </div>
+
+                    <!-- SECÇÃO DE PREFERÊNCIAS ALIMENTARES (verde) -->
+                    <div class="pref-section" id="pref-section" style="display: none;">
+                        <h3><i class="fa-solid fa-leaf"></i> Atenção às tuas preferências</h3>
+                        <div class="pref-chips" id="pref-chips"></div>
                     </div>
 
                     <div class="detail-description-box mb-5"><h3>Sobre este cabaz</h3><p id="detail-description">Descrição vai aqui.</p></div>
